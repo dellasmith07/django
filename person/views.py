@@ -7,61 +7,78 @@ from rest_framework.views import APIView
 from .models import Person
 from .serializers import PoetSerializers
 
+class RetrivePoet(generics.RetrieveAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PoetSerializers
 
-class ListPoet(APIView):
-    def get(self, request):
-        lst = Person.objects.all()
-        return Response({'Poet': PoetSerializers(lst, many=True).data})
+class GetAll(generics.ListAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PoetSerializers
 
-    def post(self, requests):
-        serializers = PoetSerializers(data=requests.data)
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
+class PostPoet(generics.CreateAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PoetSerializers
 
-        return Response({"posts": serializers.data})
-
-class UpdateDelete(APIView):
-    def put(self, requests, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-
-        if not pk: # agar pk yo'q bolsa if ishlaydi
-            return Response({"post": "Method PUT not allowed!"})
-
-        try:
-            instance = Person.objects.get(pk=pk)
-        except:
-            return Response({"post": "Object not found!"})
-
-        serializers = PoetSerializers(data=requests.data, instance=instance)
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
-        return Response({"post": serializers.data})
+class UpdataDeletePoet(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Person.objects.all()
+    serializer_class = PoetSerializers
 
 
-    def patch(self, requests, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"post": "Method PUT not allowed!"})
-
-        try:
-            instance = Person.objects.get(pk=pk)
-        except:
-            return Response({"post": "Object not found!"})
-
-        serializers = PoetSerializers(data=requests.data, instance=instance, partial=True)
-        serializers.is_valid(raise_exception=True)
-        serializers.save()
-        return Response({"post": serializers.data})
-
-
-    def delete(self, *args, **kwargs):
-        pk = kwargs.get("pk", None)
-        if not pk:
-            return Response({"post": "Method PUT not allowed!"})
-        try:
-            instance = Person.objects.get(pk=pk)
-            instance.delete()
-        except:
-            return Response({"post": "Object not found!"})
-
-        return Response({"answer": f"Deleted ID - {pk}"})
+# class ListPoet(APIView):
+#     def get(self, request):
+#
+#         lst = Person.objects.all()
+#         return Response({'Poet': PoetSerializers(lst, many=True).data})
+#
+#     def post(self, requests):
+#         serializers = PoetSerializers(data=requests.data)
+#         serializers.is_valid(raise_exception=True)
+#         serializers.save()
+#
+#         return Response({"posts": serializers.data})
+#
+# class UpdateDelete(APIView):
+#     def put(self, requests, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#
+#         if not pk: # agar pk yo'q bolsa if ishlaydi
+#             return Response({"post": "Method PUT not allowed!"})
+#
+#         try:
+#             instance = Person.objects.get(pk=pk)
+#         except:
+#             return Response({"post": "Object not found!"})
+#
+#         serializers = PoetSerializers(data=requests.data, instance=instance)
+#         serializers.is_valid(raise_exception=True)
+#         serializers.save()
+#         return Response({"post": serializers.data})
+#
+#
+#     def patch(self, requests, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"post": "Method PUT not allowed!"})
+#
+#         try:
+#             instance = Person.objects.get(pk=pk)
+#         except:
+#             return Response({"post": "Object not found!"})
+#
+#         serializers = PoetSerializers(data=requests.data, instance=instance, partial=True)
+#         serializers.is_valid(raise_exception=True)
+#         serializers.save()
+#         return Response({"post": serializers.data})
+#
+#
+#     def delete(self, *args, **kwargs):
+#         pk = kwargs.get("pk", None)
+#         if not pk:
+#             return Response({"post": "Method PUT not allowed!"})
+#         try:
+#             instance = Person.objects.get(pk=pk)
+#             instance.delete()
+#         except:
+#             return Response({"post": "Object not found!"})
+#
+#         return Response({"answer": f"Deleted ID - {pk}"})
