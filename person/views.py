@@ -1,32 +1,52 @@
 from django.forms import model_to_dict
 from django.shortcuts import render
-from rest_framework import generics
+from rest_framework import generics, viewsets, mixins
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
-from .models import Person
+from .models import Person, Category
 from .serializers import PoetSerializers
 
-class RetrivePoet(generics.RetrieveAPIView):
-    queryset = Person.objects.all()
+
+class CRUDPoet(mixins.CreateModelMixin,
+                   mixins.RetrieveModelMixin,
+                   mixins.UpdateModelMixin,
+                   mixins.DestroyModelMixin,
+                   mixins.ListModelMixin,
+                   GenericViewSet):
+    # queryset = Person.objects.all()[:1]
     serializer_class = PoetSerializers
 
-class GetAll(generics.ListAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PoetSerializers
-
-class PostPoet(generics.CreateAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PoetSerializers
-
-class UpdataDeletePoet(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Person.objects.all()
-    serializer_class = PoetSerializers
+    def get_queryset(self):
+        pk = self.kwargs.get("pk")
+        if not pk:
+            return Person.objects.all()[:3]
+        return Person.objects.filter(pk=pk)
+    @action(methods=['get'], detail=True)
+    def category(self, request, pk=None):
+        cats = Category.objects.get(pk=pk)
+        return Response({'cats': cats.name})
 
 
-# class ListPoet(APIView):
-#     def get(self, request):
+
+
+# class ListCreatePoet(generics.ListCreateAPIView):
+#     queryset = Person.objects.all()
+#     serializer_class = PoetSerializers
 #
+# class UpdataDeleteRetrivePoet(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Person.objects.all()
+#     serializer_class = PoetSerializers
+
+
+
+
+
+
+# class ListCreatePoet(APIView):
+#     def get(self, request):
 #         lst = Person.objects.all()
 #         return Response({'Poet': PoetSerializers(lst, many=True).data})
 #
@@ -37,11 +57,14 @@ class UpdataDeletePoet(generics.RetrieveUpdateDestroyAPIView):
 #
 #         return Response({"posts": serializers.data})
 #
-# class UpdateDelete(APIView):
+#
+#
+#
+#
+# class UpdataDeletePoet(APIView):
 #     def put(self, requests, *args, **kwargs):
 #         pk = kwargs.get("pk", None)
-#
-#         if not pk: # agar pk yo'q bolsa if ishlaydi
+#         if not pk:
 #             return Response({"post": "Method PUT not allowed!"})
 #
 #         try:
@@ -82,3 +105,8 @@ class UpdataDeletePoet(generics.RetrieveUpdateDestroyAPIView):
 #             return Response({"post": "Object not found!"})
 #
 #         return Response({"answer": f"Deleted ID - {pk}"})
+
+# class ListPoet(generics.ListAPIView):
+#     queryset = Person.objects.all()
+#     serializer_class = PoetSerializers
+
